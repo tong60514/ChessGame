@@ -8,6 +8,10 @@ package aibreakthroughchessgame;
 
 import static aibreakthroughchessgame.AIBrain.WallTable;
 import aibreakthroughchessgame.ChessBitBoard.RowColumnTable;
+import static aibreakthroughchessgame.ChessBoard.BlackPawn;
+import static aibreakthroughchessgame.ChessBoard.WhitePawn;
+import aibreakthroughchessgame.DataSructure.ChessMove;
+import aibreakthroughchessgame.DataSructure.Lambda_Check;
 import aibreakthroughchessgame.DataSructure.Lambda_Generator;
 import aibreakthroughchessgame.DataSructure.LeaveChess;
 import aibreakthroughchessgame.DataSructure.StructBoard;
@@ -21,8 +25,6 @@ import java.awt.Point;
 public class Transform {
     public final static RowColumnTable RowColTable = new RowColumnTable();
     public static final int F = 10000;
-    public static String[] RowIndexTable =       {"1","2","3","4","5","6","7","8"};
-    public static String[] ColumnIndexTable =     {"A","B","C","D","E","F","G","H"};
     public static int[] distrubuteScore_BlackBoard = {  0,  0,  0,  0,  0,  0,  0,  0,
                                                     10,  10,  10,  10,  10,  10,  10,  10,
                                                     10,  10,  10,  10,  10,  10,  10,  10,  
@@ -35,31 +37,68 @@ public class Transform {
     
     public static int[] distrubuteScore_WhiteBoard = {  F, F, F, F, F, F, F,F,
                                                     40,  40,  40,  40,  40,  40,  40,  40,
-                                                    30,  30,  30,  30, 30,  30,   30,  30,  
+                                                    30,  30,  30,  30,  30,  30,  30,  30,  
                                                     20,  20,  20,  20,  20,  20,  20,  20,
                                                     10,  10,  10,  10,  10,  10,  10,  10,
                                                     10,  10,  10,  10,  10,  10,  10,  10,
-                                                    10,  10,  10,  10, 10,  10,  10,  10,
-                                                    10,  10,  10,  10, 10,  10,  10,  10
+                                                    10,  10,  10,  10,  10,  10,  10,  10,
+                                                    10,  10,  10,  10,  10,  10,  10,  10
     };
-    private static Lambda_Generator legalmove = ()->{
-        
+    public static int[][] distrubuteScore = {null,distrubuteScore_WhiteBoard,distrubuteScore_BlackBoard};
+    private static final Lambda_Check legal = (color,index)->{
+        return distrubuteScore[color][index];
     };
-    private static Lambda_Generator legalcapture = ()->{
-        
+    private static final Lambda_Check illegal = (color,index)->{
+        return 0;
     };
-    private static Lambda_Generator illegalmove = ()->{
-        
+    public static final int _legal = 1;
+    public static final int _illegal = 0;
+    public static final Lambda_Check[] isLegal = {illegal,legal};
+    public static String[] RowIndexTable =       {"1","2","3","4","5","6","7","8"};
+    public static String[] ColumnIndexTable =     {"A","B","C","D","E","F","G","H"};
+    
+    public static final Lambda_Generator checksccore = (color,Src,SrcIndex,TwoBitBoard,chessmove)->{
+        return isLegal[(int)(chessmove.move(Src,TwoBitBoard,SrcIndex))].Check(color, SrcIndex);
+    }; 
+    
+    private static final ChessMove[] leftmove = {null,
+        (bit,twoBitBoard,SrcIndex)->{
+            
+            return ( (bit<<9) & empty(twoBitBoard)&~(WallTable.getColumnBitBoard(7)) )>>>(63-SrcIndex+9);
+        },
+        (bit,twoBitBoard,SrcIndex)->{return ( (bit>>>9)  & empty(twoBitBoard)&~(WallTable.getColumnBitBoard(0)))>>>(63-SrcIndex-9);} 
     };
-    private static Lambda_Generator illegalcapture = ()->{
-        
+    private static final ChessMove[] rightmove = {null,
+        (bit,twoBitBoard,SrcIndex)->{return ( (bit<<7) & empty(twoBitBoard)&~(WallTable.getColumnBitBoard(0)) )>>>(63-SrcIndex+7);},
+        (bit,twoBitBoard,SrcIndex)->{return ( (bit>>>7)& empty(twoBitBoard)&~(WallTable.getColumnBitBoard(7)) )>>>(63-SrcIndex-7);} 
     };
-    private static Lambda_Generator legal = ()->{
-        
+    private static final ChessMove[] leftcapture = {null,
+        (bit,twoBitBoard,SrcIndex)->{return ((bit<<9) & twoBitBoard[BlackPawn]&~(WallTable.getColumnBitBoard(7)))>>>(63-SrcIndex+9);},
+        (bit,twoBitBoard,SrcIndex)->{return ((bit>>>9)  & twoBitBoard[WhitePawn]&~(WallTable.getColumnBitBoard(0)))>>>(63-SrcIndex-9);} 
     };
-    private static Lambda_Generator illegal = ()->{
-        
+    
+    private static final ChessMove[] leftprotected = {null,
+        (bit,twoBitBoard,SrcIndex)->{return ((bit<<9) & twoBitBoard[WhitePawn]&~(WallTable.getColumnBitBoard(7)))>>>(63-SrcIndex+9);},
+        (bit,twoBitBoard,SrcIndex)->{
+            return ((bit>>>9) & twoBitBoard[BlackPawn]&~(WallTable.getColumnBitBoard(0)))>>>(63-SrcIndex-9);} 
     };
+    private static final ChessMove[] rightcapture = {null,
+        (bit,twoBitBoard,SrcIndex)->{return ((bit<<7) & twoBitBoard[BlackPawn]&~(WallTable.getColumnBitBoard(0)))>>>(63-SrcIndex+7);},
+        (bit,twoBitBoard,SrcIndex)->{return ((bit>>>7)  & twoBitBoard[WhitePawn]&~(WallTable.getColumnBitBoard(7)))>>>(63-SrcIndex-7);} 
+    };
+    private static final ChessMove[] rightprotected = {null,
+        (bit,twoBitBoard,SrcIndex)->{return ((bit<<7) & twoBitBoard[WhitePawn]&~(WallTable.getColumnBitBoard(0)))>>>(63-SrcIndex+7);},
+        (bit,twoBitBoard,SrcIndex)->{return ((bit>>>7)  & twoBitBoard[BlackPawn]&~(WallTable.getColumnBitBoard(7)))>>>(63-SrcIndex-7);} 
+    };
+    
+    private static final long empty(long[] twoBitBoard){
+        return ~(twoBitBoard[BlackPawn]|twoBitBoard[WhitePawn]);
+    }
+    
+    
+    
+    
+    
     
     
     public long[] indexBoard = InitIndexBitBoard();
@@ -125,11 +164,11 @@ public class Transform {
     public static int distrubuteScore_Black(StructList list,long[] bitboard){
         int score = 0 ;
         for(int i=0;i<list.Size();i++){
-            int index = list.getCurrent().getIndex();
-            long bit = list.getCurrent().getBitBoard();
-            int distruScore = distrubuteScore_BlackBoard[list.getCurrent().getIndex()];
-            int leftprotectScore = Blackleftcapture(bit,index,bitboard)*distrubuteScore_BlackBoard[index+9]*2;
-            int rightprotectScore = Blackrightcapture(bit,index,bitboard)*(distrubuteScore_BlackBoard[index+7])*2;
+            LeaveChess chess = list.getCurrent();
+            int index = chess.getIndex();
+            long bit = chess.getBitBoard();
+            int leftprotectScore = checksccore.generate(BlackPawn,bit,index,bitboard,leftprotected[BlackPawn]);
+            int rightprotectScore = checksccore.generate(BlackPawn,bit,index,bitboard,rightprotected[BlackPawn]);
             score+= (distrubuteScore_BlackBoard[list.getCurrent().getIndex()]);
         }
         return score;

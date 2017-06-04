@@ -10,5 +10,5 @@ package aibreakthroughchessgame.DataSructure;
  * @author user
  */
 public interface Lambda_Check {
-    public int isLegal();
+    public int Check(int color , int at);
 }

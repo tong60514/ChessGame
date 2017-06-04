@@ -7,8 +7,8 @@ package aibreakthroughchessgame.DataSructure;
 
 /**
  *
- * @author user
+ * @author nvidia
  */
- public interface Lambda_Generator {
-    public int generate(int color ,long Src,int SrcIndex,long[] TwoBitBoard,ChessMove move);
+public interface ChessMove {
+    public long move(long bit,long[] TwoBitBoard , int Orgindex);
 }

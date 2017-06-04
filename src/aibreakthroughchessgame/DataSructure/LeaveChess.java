@@ -27,6 +27,12 @@ public class LeaveChess {
     public final long getBitBoard(){
         return this.BitBoard;
     }
+    public void setIndex(int index){
+        this.index = index;
+    }
+    public void setBitBoard(long bit){
+        this.BitBoard = bit;
+    }
     public static LeaveChess cloneLeaveChess(LeaveChess chess){
         return new LeaveChess(chess.getIndex(),chess.getBitBoard());
     }

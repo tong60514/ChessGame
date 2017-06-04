@@ -355,14 +355,18 @@ public abstract class AIBrain extends Thread{
     public void run(){
         int currentdepth = 3;
         this.expandBranches(this.root);
-        while(true){
-            parellelCompute(this.root.getNodes(),currentdepth);
+        //while(true){
+            parellelCompute(this.root.getNodes(),7);
+            System.exit(0);
             currentdepth++;
             this.root.setBranchNode(TopBranches);
+            this.best = TopBranches.getFirst();
             TopBranches= new LinkedList();
-        }
+            this.controler.AIMove(best);
+        //}
         
-        
+        IterativeAlphaBetaNegaMax(this.root.getNodes(),7);
+        System.exit(0);
         /*while(true){
            this.TurnLock.lock();
            try{
