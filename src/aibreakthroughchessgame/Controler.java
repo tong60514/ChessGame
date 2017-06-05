@@ -40,7 +40,7 @@ public class Controler extends javax.swing.JFrame {
     private Lock TurnLock = new ReentrantLock();
     private JDesktopPane desktop = new JDesktopPane();
     private static AIBrain[] AI = new AIBrain[3];
-    public int ThinkingTime=30;
+    public int ThinkingTime=10;
     /**
      * Creates new form Controler
      */
@@ -288,16 +288,16 @@ public class Controler extends javax.swing.JFrame {
 
     private void Computer2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Computer2ActionPerformed
         // TODO add your handling code here:
-        setUpAIPlayer(2);
+        AIPlayeron(2);
         Controler.AI[2] = new BlackBrain(this);
         Controler.AI[2].start();
     }//GEN-LAST:event_Computer2ActionPerformed
 
     private void Computer1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Computer1ActionPerformed
         // TODO add your handling code here:
-        setUpAIPlayer(1);
+        AIPlayeron(1);
         Controler.AI[1] = new WhiteBrain(this);
-        Controler.AI[1].start();
+        //Controler.AI[1].start();
     }//GEN-LAST:event_Computer1ActionPerformed
 
     private void ClosAIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ClosAIActionPerformed
@@ -359,7 +359,6 @@ public class Controler extends javax.swing.JFrame {
         MyCounter frame = new MyCounter(seconds,task);
         frame.setVisible(gui); //necessary as of 1.3
         jDesktopPane1.add(frame);
-        this.timer = frame;
         frame.start();
         try {
             frame.setSelected(true);
@@ -379,7 +378,7 @@ public class Controler extends javax.swing.JFrame {
         
         this.setVisible(true);
     }
-    public void setUpAIPlayer(int Color){
+    public void AIPlayeron(int Color){
         this.AIChessType = Color;
     }
     public void unVisibleImage(){
@@ -417,7 +416,6 @@ public class Controler extends javax.swing.JFrame {
     public void AIMove(Node node){
         stepCount++;
         BoardMove(node.getSrc(),node.getTarget());
-        //signalAI(node.getSrc(),node.getTarget());
         CancelTimer();
         if(GameState[this.WhoseTurn].Terminnate(this.chessContainer1.getChessBitBoard())){
             GameOver(this.WhoseTurn);
@@ -442,7 +440,6 @@ public class Controler extends javax.swing.JFrame {
         }
         record(stepCount,this.WhoseTurn,from,to);
         this.WhoseTurn = ChessBitBoard.getOppisiteColor(this.WhoseTurn);
-        System.out.println("who " + this.WhoseTurn);
         this.TurnTable[WhoseTurn].perform();
         this.repaint();
     }
@@ -527,9 +524,10 @@ public class Controler extends javax.swing.JFrame {
         public void perform() {
             unVisibleImage();
             BlackTurn();
-            creatDelayEvent(ThinkingTime,()->{
+            timer = creatDelayEvent(ThinkingTime,()->{
                 GameOver(WhitePawn);
             },true);
+            
             timer.setLocation(1000,100);
         }
     }
@@ -543,7 +541,7 @@ public class Controler extends javax.swing.JFrame {
         public void perform() {
             unVisibleImage();
             WhiteTurn();
-            creatDelayEvent(ThinkingTime,()->{
+            timer = creatDelayEvent(ThinkingTime,()->{
                 GameOver(BlackPawn);
             },true);
             timer.setLocation(1000,100);

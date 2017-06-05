@@ -31,6 +31,7 @@ public abstract class AIBrain extends Thread{
     }};*/
     
     protected Controler controler;
+    protected int color ; 
     protected LinkedList<Node> TopBranches = new LinkedList();
     protected Node best;
     protected long[] TwoBitBoard ;
@@ -85,8 +86,7 @@ public abstract class AIBrain extends Thread{
     
     
     protected void ColorSelet(int color){
-        this.root = new RootNode(color);
-        this.currentSearchNode = root;
+        this.color = color;
     }
     
     public void UpdateInfo(Node nextStep){
@@ -310,14 +310,12 @@ public abstract class AIBrain extends Thread{
             BackTrack();
             sortingNode( SortedList , node );
         }
-        System.out.println("finish");
         return SortedList;
     }
     public void parellelCompute(LinkedList<Node> nodes , int depth){
         
         
             for( Node node : nodes){
-                // seperate thread
                 Search(node);
                 this.aicontainer.add(new AIConcurrency(
                         this,this.TwoBitBoard.clone(),StructBoard.cloneBoard(structBoard),depth-1));
@@ -326,7 +324,6 @@ public abstract class AIBrain extends Thread{
             }
         waitJoin(nodes.size());
         this.aicontainer = new LinkedList();
-        // wait thread join 
         return;
     }
     private void sortingNode(LinkedList<Node> stepList, Node node ){
@@ -334,6 +331,11 @@ public abstract class AIBrain extends Thread{
             stepList.add(node);
         else{
             stepList.addFirst(node);
+        }
+    }
+    private void stopall(){
+        for(AIConcurrency a : this.aicontainer){
+            a.interrupt();
         }
     }
     public void addBranches(Node node){
@@ -349,24 +351,35 @@ public abstract class AIBrain extends Thread{
             this.joinLock.unlock();
         }
     }
+    private void thinking(){
+        controler.creatDelayEvent(controler.ThinkingTime-3, ()->{
+            controler.AIMove(best);
+            stopall();
+            this.interrupt();
+        }, false);
+    }
+    
     
     
     
     public void run(){
-        int currentdepth = 3;
+        thinking();
+        this.root = new RootNode(color);
+        this.currentSearchNode = root;
+        int currentdepth = 1;
         this.expandBranches(this.root);
-        //while(true){
-            parellelCompute(this.root.getNodes(),7);
-            System.exit(0);
+        while(true){
+            parellelCompute(this.root.getNodes(),currentdepth);
+            System.out.println("depth finishes : " + currentdepth);
             currentdepth++;
             this.root.setBranchNode(TopBranches);
             this.best = TopBranches.getFirst();
             TopBranches= new LinkedList();
-            this.controler.AIMove(best);
-        //}
+            //this.controler.AIMove(best);
+        }
         
-        IterativeAlphaBetaNegaMax(this.root.getNodes(),7);
-        System.exit(0);
+        /*IterativeAlphaBetaNegaMax(this.root.getNodes(),7);
+        System.exit(0);*/
         /*while(true){
            this.TurnLock.lock();
            try{
@@ -385,6 +398,7 @@ public abstract class AIBrain extends Thread{
     }
     
     
+    
     private void yourTurn (){
         this.TurnLock.lock();
         try{
@@ -399,14 +413,13 @@ public abstract class AIBrain extends Thread{
         try{
             while(this.TopBranches.size()!=finalbranches)
                 try {
-                    System.out.println("wait!!");
                     unjoin.await();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(AIBrain.class.getName()).log(Level.SEVERE, null, ex);
+                    
                 }
         }finally{
              this.joinLock.unlock();
-             System.out.println("Go!!");
         }
     }
     static final class RootNode extends Node {

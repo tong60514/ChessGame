@@ -57,6 +57,7 @@ public class Transform {
     public static String[] RowIndexTable =       {"1","2","3","4","5","6","7","8"};
     public static String[] ColumnIndexTable =     {"A","B","C","D","E","F","G","H"};
     
+    
     public static final Lambda_Generator checksccore = (color,Src,SrcIndex,TwoBitBoard,chessmove)->{
         return isLegal[(int)(chessmove.move(Src,TwoBitBoard,SrcIndex))].Check(color, SrcIndex);
     }; 
@@ -193,6 +194,8 @@ public class Transform {
     public static int Whiterightcapture(long Src,int SrcIndex,long[] TwoBitBoard) {
         return (int) ( ((Src<<7)&TwoBitBoard[ChessBoard.BlackPawn]&~(WallTable.getColumnBitBoard(7)))>>>(63-SrcIndex+7) );
     }
+    
+    
     
     
 }

@@ -3,19 +3,17 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/AIBrain.java</file>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/ChessBoard.java</file>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/AIConcurrency.java</file>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/DataSructure/Lambda_Generator.java</file>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/DataSructure/LeaveChess.java</file>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/ChessBitBoard.java</file>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/Transform.java</file>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/DataSructure/Lambda_Check.java</file>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/DataSructure/MoveNode.java</file>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/DataSructure/StructList.java</file>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/Controler.java</file>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/DataSructure/StructBoard.java</file>
-            <file>file:/home/nvidia/ChessGame/src/aibreakthroughchessgame/DataSructure/ChessMove.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/ChessContainer.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/Neuron.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/Inputlayer.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/MyCounter.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/BlackBrain.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/Hiddenlayer.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/Controler.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/layer.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/Outputlayer.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/network.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/AIBrain.java</file>
         </group>
     </open-files>
 </project-private>
