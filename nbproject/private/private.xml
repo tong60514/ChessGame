@@ -6,14 +6,19 @@
             <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/ChessContainer.java</file>
             <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/Neuron.java</file>
             <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/Inputlayer.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/CaptureNode.java</file>
             <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/MyCounter.java</file>
-            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/BlackBrain.java</file>
-            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/Hiddenlayer.java</file>
             <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/Controler.java</file>
             <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/layer.java</file>
             <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/Outputlayer.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/Predictor.java</file>
             <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/network.java</file>
             <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/AIBrain.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/WhitePawnHint.jpg</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/StructBoard.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/neuronNetwork/Hiddenlayer.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/DataSructure/Node.java</file>
+            <file>file:/C:/Users/user/Documents/ChessGame/src/aibreakthroughchessgame/AIConcurrency.java</file>
         </group>
     </open-files>
 </project-private>

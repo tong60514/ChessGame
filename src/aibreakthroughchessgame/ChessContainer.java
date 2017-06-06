@@ -5,6 +5,9 @@
  */
 package aibreakthroughchessgame;
 
+import aibreakthroughchessgame.DataSructure.CaptureNode;
+import aibreakthroughchessgame.DataSructure.MoveNode;
+import aibreakthroughchessgame.DataSructure.Node;
 import javax.swing.JPanel;
 
 /**
@@ -25,12 +28,16 @@ public class ChessContainer extends javax.swing.JPanel implements Runnable {
         this.setSize(800,800);
         new Thread(this).start();
     }
-    public void BoardMove(int index , int toIndex){
+    public Node BoardMove(int color , int index , int toIndex){
+        Node node;
         Chess srcChess = ChessIndexBoard[index];
         ChessIndexBoard[index] = null;
         if(ChessIndexBoard[toIndex]!=null){
             ChessIndexBoard[toIndex].setVisible(false);
             ChessIndexBoard[toIndex] = null;
+            node = new CaptureNode(null,index,toIndex,color);
+        }else{
+            node = new MoveNode(null,index,toIndex,color);
         }
         srcChess.setBoardIndex(toIndex);
         ChessIndexBoard[toIndex] = srcChess;
@@ -38,6 +45,7 @@ public class ChessContainer extends javax.swing.JPanel implements Runnable {
         this.Board.move(index, toIndex);
         this.repaint();
         this.control.unFocusChess();
+        return node;
     }
     public Chess[] getChessTable(){
         return this.ChessIndexBoard;

@@ -39,7 +39,7 @@ public class Controler extends javax.swing.JFrame {
     public int WhoseTurn = 1;
     private Lock TurnLock = new ReentrantLock();
     private JDesktopPane desktop = new JDesktopPane();
-    private static AIBrain[] AI = new AIBrain[3];
+    public static AIBrain[] AI = new AIBrain[3];
     public int ThinkingTime=10;
     /**
      * Creates new form Controler
@@ -61,10 +61,10 @@ public class Controler extends javax.swing.JFrame {
         setUpGame();
         
     }
-    private void setAI(){
-        AIBrain[] brains = {null,new WhiteBrain(this),new BlackBrain(this)};
+    /*private void setAI(){
+        AIBrain[] brains = {null,new AIBrain(this,WhitePawn),new AIBrain(this,BlackPawn)};
         Controler.AI = brains;
-    }
+    }*/
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -89,6 +89,10 @@ public class Controler extends javax.swing.JFrame {
         ClosAI = new javax.swing.JButton();
         AIPK = new javax.swing.JButton();
         chessContainer1 = new aibreakthroughchessgame.ChessContainer();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        aiSetting = new javax.swing.JMenuItem();
+        restart = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(null);
@@ -283,21 +287,46 @@ public class Controler extends javax.swing.JFrame {
         getContentPane().add(jDesktopPane1);
         jDesktopPane1.setBounds(0, 0, 1520, 950);
 
+        jMenu1.setText("setting");
+
+        aiSetting.setText("AIsetting");
+        aiSetting.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aiSettingActionPerformed(evt);
+            }
+        });
+        jMenu1.add(aiSetting);
+
+        restart.setText("playersetting");
+        restart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                restartActionPerformed(evt);
+            }
+        });
+        jMenu1.add(restart);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void Computer2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Computer2ActionPerformed
         // TODO add your handling code here:
         AIPlayeron(2);
-        Controler.AI[2] = new BlackBrain(this);
+        Controler.AI[2] = new AIBrain(this ,BlackPawn);
         Controler.AI[2].start();
+        if(this.AIChessType == WhoseTurn){
+            Controler.AI[2].thinking();
+        }
     }//GEN-LAST:event_Computer2ActionPerformed
 
     private void Computer1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Computer1ActionPerformed
         // TODO add your handling code here:
         AIPlayeron(1);
-        Controler.AI[1] = new WhiteBrain(this);
-        //Controler.AI[1].start();
+        Controler.AI[1] = new AIBrain(this,WhitePawn);
+        Controler.AI[1].start();
     }//GEN-LAST:event_Computer1ActionPerformed
 
     private void ClosAIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ClosAIActionPerformed
@@ -317,6 +346,14 @@ public class Controler extends javax.swing.JFrame {
         Controler.AI[2] = new BlackBrain(this);
         AIPK(this.WhoseTurn);*/
     }//GEN-LAST:event_AIPKActionPerformed
+
+    private void aiSettingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aiSettingActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_aiSettingActionPerformed
+
+    private void restartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_restartActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_restartActionPerformed
 
     /**
      * @param args the command line arguments
@@ -402,7 +439,6 @@ public class Controler extends javax.swing.JFrame {
         this.WaitingChess.Focus();
         HintLegalMove(chess.getIndex(),chess.getType());
     }
-    
     public void unFocusChess(){
         if(this.WaitingChess==null)
             return;
@@ -410,12 +446,12 @@ public class Controler extends javax.swing.JFrame {
         this.WaitingChess.unFocus();
         this.WaitingChess=null;
     }
-    public void BoardMove(int Index , int toIndex){
-        this.chessContainer1.BoardMove(Index, toIndex);
+    public Node BoardMove(int Index , int toIndex){
+        return this.chessContainer1.BoardMove(WhoseTurn,Index, toIndex);
     }
     public void AIMove(Node node){
         stepCount++;
-        BoardMove(node.getSrc(),node.getTarget());
+        Node c = BoardMove(node.getSrc(),node.getTarget());
         CancelTimer();
         if(GameState[this.WhoseTurn].Terminnate(this.chessContainer1.getChessBitBoard())){
             GameOver(this.WhoseTurn);
@@ -433,7 +469,7 @@ public class Controler extends javax.swing.JFrame {
         stepCount++;
         int from = this.WaitingChess.getIndex();
         int to = toIndex;
-        BoardMove(from,to);
+        Node c = BoardMove(from,to);
         CancelTimer();
         if(GameState[this.WhoseTurn].Terminnate(this.chessContainer1.getChessBitBoard())){
             GameOver(this.WhoseTurn);
@@ -442,6 +478,14 @@ public class Controler extends javax.swing.JFrame {
         this.WhoseTurn = ChessBitBoard.getOppisiteColor(this.WhoseTurn);
         this.TurnTable[WhoseTurn].perform();
         this.repaint();
+        if(AIChessType!=0){
+            Controler.AI[WhoseTurn].signalAI(c);
+        }
+    }
+    private void tryAIisAlive(Node node){
+        if(this.AIChessType!=0){
+            //Controler.AI[WhoseTurn]
+        }
     }
     private void GameOver(int Who_Win){
         this.GameState[Who_Win].Win();
@@ -614,8 +658,12 @@ public class Controler extends javax.swing.JFrame {
     private javax.swing.JEditorPane Recorder;
     private javax.swing.JPanel WhiteTurn;
     private javax.swing.JLabel WinTextr;
+    private javax.swing.JMenuItem aiSetting;
     private aibreakthroughchessgame.ChessContainer chessContainer1;
     private javax.swing.JDesktopPane jDesktopPane1;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JMenuItem restart;
     // End of variables declaration//GEN-END:variables
 }

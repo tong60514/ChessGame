@@ -48,7 +48,7 @@ public class ChessBitBoard {             //0 1 2 3 4 5 6 7
     public long getBitBoard(int Color){
         return this.ChessBitBoard[Color];
     }
-    public long[] getChessBitBoard(){
+    public long[] getTwoBitBoard(){
         return this.ChessBitBoard;
     }
     public long[] getIndexBitBoard(){

@@ -7,11 +7,13 @@ package aibreakthroughchessgame;
 
 import aibreakthroughchessgame.DataSructure.Node;
 import aibreakthroughchessgame.ChessBitBoard.RowColumnTable;
+import static aibreakthroughchessgame.ChessBitBoard.getOppisiteColor;
 import static aibreakthroughchessgame.ChessBoard.BlackPawn;
 import static aibreakthroughchessgame.ChessBoard.WhitePawn;
 import aibreakthroughchessgame.DataSructure.LeaveChess;
 import static aibreakthroughchessgame.DataSructure.Node.GenerateCapture;
 import static aibreakthroughchessgame.DataSructure.Node.GenerateMove;
+import aibreakthroughchessgame.DataSructure.Predictor;
 import aibreakthroughchessgame.DataSructure.StructBoard;
 import aibreakthroughchessgame.DataSructure.StructList;
 import java.util.LinkedList;
@@ -25,22 +27,39 @@ import java.util.logging.Logger;
  *
  * @author user
  */
-public abstract class AIBrain extends Thread{
+public class AIBrain extends Thread{
     /*protected final AITask[] AIPerformance = {()->{
         
     }};*/
     
     protected Controler controler;
     protected int color ; 
-    protected LinkedList<Node> TopBranches = new LinkedList();
-    protected Node best;
+    protected LinkedList<Node> TopBranches ;
+    protected LinkedList<Node> lastBranch;
     protected long[] TwoBitBoard ;
-    protected static final long[] IndexBitBoard = Transform.InitIndexBitBoard() ;
     protected StructBoard structBoard;
+    protected static final long[] IndexBitBoard = Transform.InitIndexBitBoard() ;
     protected Generator[] generator = {null,new WhiteGenerator(),new BlackGenerator()};
     protected Node root;
     protected Node currentSearchNode = null;
-    protected LinkedList<AIConcurrency>  aicontainer; 
+    protected LinkedList<AIConcurrency>  aicontainer;
+    protected Node predictNode = null;
+    protected static Predictor[] predictor = { null ,
+        (controler,node)->{
+            System.out.println("guess " + node.getSrc() + " to " + node.getTarget());
+            AIBrain brain = new AIBrain(controler,WhitePawn);
+            brain.Search(node);
+            brain.predictNode = node;
+        return brain;
+    },  (controler,node)->{
+            System.out.println("guess " + node.getSrc() + " to " + node.getTarget());
+            AIBrain brain = new AIBrain(controler,BlackPawn);
+            brain.Search(node);
+            brain.predictNode = node;
+            return brain;
+        }
+    };
+    
     
     protected int depth=5;
     public static final RowColumnTable WallTable = new RowColumnTable();
@@ -52,20 +71,21 @@ public abstract class AIBrain extends Thread{
     protected Condition unjoin = joinLock.newCondition();
     protected Condition notYourTurn = TurnLock.newCondition();
     
-    public AIBrain(Controler controler){
+    public AIBrain(Controler controler,int color){
         this.controler = controler;
-        this.TwoBitBoard = controler.getChessContainer().getChessBitBoard().getChessBitBoard().clone();
-        this.structBoard = new StructBoard(controler.getChessContainer().getChessBitBoard().getIndexArray().clone());
+        initBoardInfo(controler.getChessContainer().getChessBitBoard().getTwoBitBoard(),
+                new StructBoard(controler.getChessContainer().getChessBitBoard().getIndexArray()));
+        this.ColorSelet(color);
+    }
+    public AIBrain(long[] TwoBitBoard,StructBoard structBoard){
+        initBoardInfo(TwoBitBoard,structBoard);
+    }
+    private void initBoardInfo(long[] TwoBitBoard,StructBoard structBoard){
+        this.TwoBitBoard = TwoBitBoard.clone();
+        this.structBoard = StructBoard.cloneBoard(structBoard);
         this.aicontainer = new LinkedList();
-        InitDepth();
+        this.TopBranches = new LinkedList();
     }
-    public AIBrain(long[] TwoBitBoard,StructBoard structBoard ,Node root){
-        this.TwoBitBoard = TwoBitBoard;
-        this.structBoard = structBoard;
-        this.root = root;
-        this.currentSearchNode = root;
-    }
-    public AIBrain(){}
     public long[] getBitBoard(){
         return this.TwoBitBoard;
     }
@@ -92,12 +112,7 @@ public abstract class AIBrain extends Thread{
     public void UpdateInfo(Node nextStep){
         this.root = nextStep;
         this.currentSearchNode = nextStep;
-        InitDepth();
         this.Search(nextStep);
-    }
-    public AIBrain(long[] TwoBitBoardClone ,StructBoard structBoard){
-        this.TwoBitBoard = TwoBitBoardClone;
-        this.structBoard = structBoard;
     }
     
     private long empty(){
@@ -287,7 +302,6 @@ public abstract class AIBrain extends Thread{
             addCapture(chess.getIndex(),searchNode);
         }
     }
-    public abstract void MoveSignal(Node node);
     private final void expandCaptureNodes(Node searchNode){
         expandCapture(searchNode);
     }
@@ -297,9 +311,6 @@ public abstract class AIBrain extends Thread{
         expandCapture(searchNode);
     }
     
-    private void InitDepth(){
-        this.depth = 2;
-    }
     public LinkedList IterativeAlphaBetaNegaMax(LinkedList<Node> steplist,int depth){
         LinkedList<Node> SortedList = new LinkedList();
         for(Node node : steplist){
@@ -334,6 +345,7 @@ public abstract class AIBrain extends Thread{
         }
     }
     private void stopall(){
+        this.interrupt();
         for(AIConcurrency a : this.aicontainer){
             a.interrupt();
         }
@@ -351,19 +363,42 @@ public abstract class AIBrain extends Thread{
             this.joinLock.unlock();
         }
     }
-    private void thinking(){
+    
+    public void thinking(){
         controler.creatDelayEvent(controler.ThinkingTime-3, ()->{
-            controler.AIMove(best);
             stopall();
-            this.interrupt();
+            Node best = this.lastBranch.getFirst();
+            controler.AIMove(best);
+            Node guess = best.getNodes().getFirst();
+            System.out.println("guess " + guess.getSrc() + " to " + guess.getTarget());
+            Controler.AI[color] = AIBrain.predictor[color].predict(controler,guess);
+            Controler.AI[color].start();
         }, false);
+    }
+    
+    public void signalAI(Node node){
+        if(!isSameNode(predictNode,node)){
+            Controler.AI[color].stopall();
+            System.out.println("guess wrong");
+            Controler.AI[color] = new AIBrain(controler , color);
+            Controler.AI[color].start();
+        }
+        Controler.AI[color].thinking();
+    }
+    private void initRoot(Node node){
+        this.root = new RootNode(getOppisiteColor(node.getColor()));
+        this.currentSearchNode = this.root;
+    }
+    private boolean isSameNode(Node node1 , Node node2){
+        if(node1==null||node2==null)
+            return false;
+        return node1.getSrc()==node2.getSrc()&&node1.getTarget()==node2.getTarget();
     }
     
     
     
     
     public void run(){
-        thinking();
         this.root = new RootNode(color);
         this.currentSearchNode = root;
         int currentdepth = 1;
@@ -373,11 +408,9 @@ public abstract class AIBrain extends Thread{
             System.out.println("depth finishes : " + currentdepth);
             currentdepth++;
             this.root.setBranchNode(TopBranches);
-            this.best = TopBranches.getFirst();
+            this.lastBranch = TopBranches;
             TopBranches= new LinkedList();
-            //this.controler.AIMove(best);
         }
-        
         /*IterativeAlphaBetaNegaMax(this.root.getNodes(),7);
         System.exit(0);*/
         /*while(true){
@@ -416,6 +449,7 @@ public abstract class AIBrain extends Thread{
                     unjoin.await();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(AIBrain.class.getName()).log(Level.SEVERE, null, ex);
+                    
                     
                 }
         }finally{
